@@ -7,27 +7,18 @@ const path = require("path");
 
 
 module.exports = {
-    async recognizeContent(client) {
+    async recognizeContent(client, filePath) {
 
 
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('My Sheet');
 
         try {
-
-            const fileName = path.join(__dirname, "../Test.png");
-
-
-            if (!fs.existsSync(fileName)) {
-                throw new Error(`Expecting file ${fileName} exists`);
-            }
-    
-            const readStream = fs.createReadStream(fileName);
     
     
-    
+            const fileStream = fs.createReadStream(filePath)
             const formUrl = "https://raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/simple-invoice.png";
-            const poller = await client.beginRecognizeContent(readStream);
+            const poller = await client.beginRecognizeContent(fileStream);
             const pages = await poller.pollUntilDone();
         
             if (!pages || pages.length === 0) {
@@ -49,25 +40,19 @@ module.exports = {
                         excelCell.value = cell.text
                         //console.log(`cell [${cell.rowIndex},${cell.columnIndex}] has text ${cell.text}`);
                     }
-
-                    console.log(worksheet.getCell('A1').value)
                     
                 }
             }
 
-
-            const newFile = path.join(__dirname, "../test.xlsx");
             
 // write to a new buffer
 const buffer = await workbook.xlsx.writeBuffer();
 
-fs.writeFile(newFile, buffer, function (err) {
-    if (err) return console.log(err);
-    console.log('Hello World > helloworld.txt');
-  });
+
+  return buffer
       
         }catch(error) {
-            console.log(error.message)
+            throw new Error('something happened')
         }
 
     }
