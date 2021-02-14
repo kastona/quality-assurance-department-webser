@@ -11,6 +11,7 @@
   "author": "Stephen Kastona",
   "license": "ISC",
   "dependencies": {
+    "@azure/ai-form-recognizer": "^3.0.0",
     "axios": "^0.21.1",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
