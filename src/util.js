@@ -29,17 +29,20 @@ module.exports = {
                 console.log(
                     `Page ${page.pageNumber}: width ${page.width} and height ${page.height} with unit ${page.unit}`
                 );
+                let tableStart = 0;
                 for (const table of page.tables) {
                     let rowCount = table.rowCount
                     let columnCount = table.columnCount
                     for (const cell of table.cells) {
 
-                        console.log((`${String.fromCharCode(65 + cell.columnIndex)}`+(cell.rowIndex)))
+                        console.log((`${String.fromCharCode(65 + cell.columnIndex)}`+(cell.rowIndex + tableStart)))
                         const excelCell = worksheet.getCell(`${String.fromCharCode(65 + cell.columnIndex)}`+(cell.rowIndex+1));
 
                         excelCell.value = cell.text
                         //console.log(`cell [${cell.rowIndex},${cell.columnIndex}] has text ${cell.text}`);
                     }
+
+                    tableStart += rowCount + 2
                     
                 }
             }
