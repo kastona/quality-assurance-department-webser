@@ -1,6 +1,9 @@
 const https = require('https');
 const axios = require('axios');
 const ExcelJS = require('exceljs');
+const sleep = require('util').promisify(setTimeout);
+const bufferToArrayBuffer = require('buffer-to-arraybuffer');
+ 
 
 const fs = require("fs");
 const path = require("path");
@@ -17,7 +20,6 @@ module.exports = {
     
     
             const fileStream = fs.createReadStream(filePath)
-            const formUrl = "https://raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/simple-invoice.png";
             const poller = await client.beginRecognizeContent(fileStream);
             const pages = await poller.pollUntilDone();
         
@@ -48,15 +50,67 @@ module.exports = {
             }
 
             
-// write to a new buffer
-const buffer = await workbook.xlsx.writeBuffer();
+            // write to a new buffer
+            const buffer = await workbook.xlsx.writeBuffer();
 
 
-        return buffer
+            return buffer
       
         }catch(error) {
             throw new Error('something happened')
         }
 
-    }
+    },
+
+    async textractText(computerVisionClient, file) {
+        
+        //const fileStream = await fs.createReadStream(filePath)
+
+        const arrayBuffer = bufferToArrayBuffer(file.buffer);
+        const printedResult = await this.readTextFromURL(computerVisionClient, arrayBuffer);
+        return this.printRecText(printedResult);
+
+
+    },
+
+
+    async readTextFromURL(client, fileStream) {
+
+        const STATUS_SUCCEEDED = "succeeded";
+
+        
+
+        // To recognize text in a local image, replace client.read() with readTextInStream() as shown:
+        let result = await client.readInStream(fileStream);
+        // Operation ID is last path segment of operationLocation (a URL)
+        let operation = result.operationLocation.split('/').slice(-1)[0];
+      
+        // Wait for read recognition to complete
+        // result.status is initially undefined, since it's the result of read
+        while (result.status !== STATUS_SUCCEEDED) { await sleep(1000); result = await client.getReadResult(operation); }
+        return result.analyzeResult.readResults; // Return the first page of result. Replace [0] with the desired page if this is a multi-page file such as .pdf or .tiff.
+      },
+
+      printRecText(readResults) {
+        let foundPages = []
+        console.log('Recognized text:');
+        for (const page in readResults) {
+          let text = ''
+          if (readResults.length > 1) {
+            console.log(`==== Page: ${page}`);
+          }
+          const result = readResults[page];
+          if (result.lines.length) {
+            for (const line of result.lines) {
+              
+              text +=(line.words.map(w => w.text).join(' ')) + '\n';
+            }
+          }
+          else { console.log('No recognized text.'); }
+
+          foundPages.push(text)
+        }
+
+        return foundPages;
+      }
 };

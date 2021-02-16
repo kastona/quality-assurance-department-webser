@@ -15,12 +15,19 @@ app.use(cors())
 
 const endpoint = process.env.END_POINT;
 const apiKey = process.env.KEY;
-const postUrl = `${endpoint}/formrecognizer/v2.1-preview.2/layout/analyze`
+const readEndpoint = process.env.READ_END_POINT;
+const readAPIKey = process.env.READ_API_KEY
 
-const { FormRecognizerClient, FormTrainingClient, AzureKeyCredential } = require("@azure/ai-form-recognizer");
+
+const { FormRecognizerClient, AzureKeyCredential } = require("@azure/ai-form-recognizer");
+const ComputerVisionClient = require('@azure/cognitiveservices-computervision').ComputerVisionClient;
+const ApiKeyCredentials = require('@azure/ms-rest-js').ApiKeyCredentials;
+const computerVisionClient = new ComputerVisionClient(
+    new ApiKeyCredentials({ inHeader: { 'Ocp-Apim-Subscription-Key': readAPIKey } }), readEndpoint);
+
+
 const client = new FormRecognizerClient(endpoint, new AzureKeyCredential(apiKey));
 
-const fileName = path.join(__dirname, './file.jpg');
 
 const upload = multer({
     limits: {
@@ -44,6 +51,28 @@ const upload = multer({
     })
 })
 
+
+
+
+const myUpload = multer({
+    limits: {
+        fileSize: 3000000
+    },
+    fileFilter(req, file, cb) {
+        console.log("i am called!")
+        if(!file.originalname.match(/\.(jpeg|jpg|png|pdf)/)) {
+            return cb(new Error('Please upload an image'))
+        }
+
+        
+        cb(undefined, true)
+    },
+
+    storage: multer.memoryStorage()
+
+})
+
+
 app.post('/files', upload.single('file'), async (req, res) => {
 
     try {
@@ -58,6 +87,19 @@ app.post('/files', upload.single('file'), async (req, res) => {
         return res.send('error')
     }
     
+})
+
+
+app.post('/read', myUpload.single('file'), async (req, res) => {
+
+
+
+
+
+
+    const printedTextSampleURL = 'https://moderatorsampleimages.blob.core.windows.net/samples/sample2.jpg';
+    const result = await util.textractText(computerVisionClient, req.file);
+    res.send(result)
 })
 
 
