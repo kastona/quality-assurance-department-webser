@@ -9,18 +9,9 @@ const app = express()
 const PORT = process.env.PORT || 4000
 
 
-app.use(function (req, res, next) {
-
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'https://qad-ust.web.app');
-
-
-    // Pass to next layer of middleware
-    next();
-});
 
 let cors = require('cors')
-//app.use(cors())
+app.use(cors({origin: 'https://qad-ust.web.app'}));
 
 const endpoint = process.env.END_POINT;
 const apiKey = process.env.KEY;
