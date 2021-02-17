@@ -1,7 +1,7 @@
 const express = require('express')
 const fs = require("fs");
 const path = require("path");
-const util = require('./util');
+
 const multer = require('multer')
 require('dotenv').config()
 
@@ -12,6 +12,8 @@ const PORT = process.env.PORT || 4000
 
 let cors = require('cors')
 app.use(cors({origin: 'https://qad-ust.web.app'}));
+
+const util = require('./util');
 
 const endpoint = process.env.END_POINT;
 const apiKey = process.env.KEY;
