@@ -10,6 +10,8 @@ const PORT = process.env.PORT || 4000
 
 app.use(express.json())
 
+let cors = require('cors')
+app.use(cors({origin: '*'}));
 
 const util = require('./util');
 
