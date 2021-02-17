@@ -11,7 +11,6 @@ const PORT = process.env.PORT || 4000
 
 
 let cors = require('cors')
-app.use(cors({origin: '*'}));
 
 const util = require('./util');
 
@@ -75,7 +74,7 @@ const myUpload = multer({
 })
 
 
-app.post('/files', upload.single('file'), async (req, res) => {
+app.post('/files',cors({origin: '*'}), upload.single('file'), async (req, res) => {
 
     try {
 
@@ -92,7 +91,7 @@ app.post('/files', upload.single('file'), async (req, res) => {
 })
 
 
-app.post('/read', myUpload.single('file'), async (req, res) => {
+app.post('/read', cors({origin: '*'}), myUpload.single('file'), async (req, res) => {
 
 
 
