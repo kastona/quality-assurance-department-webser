@@ -10,7 +10,6 @@ const PORT = process.env.PORT || 4000
 
 
 let cors = require('cors')
-
 app.use(cors())
 
 const endpoint = process.env.END_POINT;
