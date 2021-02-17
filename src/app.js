@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 4000
 
 
 let cors = require('cors')
-app.use(cors({origin: 'https://qad-ust.web.app'}));
+app.use(cors({origin: '*'}));
 
 const util = require('./util');
 
