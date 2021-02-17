@@ -8,9 +8,10 @@ require('dotenv').config()
 const app = express()
 const PORT = process.env.PORT || 4000
 
-
+app.use(express.json())
 
 let cors = require('cors')
+app.use(cors({origin: '*'}));
 
 const util = require('./util');
 
@@ -74,7 +75,7 @@ const myUpload = multer({
 })
 
 
-app.post('/files',cors({origin: '*'}), upload.single('file'), async (req, res) => {
+app.post('/files', upload.single('file'), async (req, res) => {
 
     try {
 
@@ -91,7 +92,7 @@ app.post('/files',cors({origin: '*'}), upload.single('file'), async (req, res) =
 })
 
 
-app.post('/read', cors({origin: '*'}), myUpload.single('file'), async (req, res) => {
+app.post('/read', myUpload.single('file'), async (req, res) => {
 
 
 
