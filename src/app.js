@@ -8,6 +8,25 @@ require('dotenv').config()
 const app = express()
 const PORT = process.env.PORT || 4000
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 app.use(express.json())
 
 let cors = require('cors')
@@ -61,7 +80,6 @@ const myUpload = multer({
         fileSize: 3000000
     },
     fileFilter(req, file, cb) {
-        console.log("i am called!")
         if(!file.originalname.match(/\.(jpeg|jpg|png|pdf)/)) {
             return cb(new Error('Please upload an image'))
         }
@@ -103,6 +121,7 @@ app.post('/read', myUpload.single('file'), async (req, res) => {
     const result = await util.textractText(computerVisionClient, req.file);
     res.send(result)
 })
+
 
 
 
