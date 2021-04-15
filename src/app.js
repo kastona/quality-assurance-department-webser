@@ -116,10 +116,16 @@ app.post('/read', myUpload.single('file'), async (req, res) => {
 
 
 
+    let filename = req.body.filename? req.body.filename: 'converted file'
 
-    const printedTextSampleURL = 'https://moderatorsampleimages.blob.core.windows.net/samples/sample2.jpg';
     const result = await util.textractText(computerVisionClient, req.file);
-    res.send(result)
+    let buffer = Buffer.from(result[0])
+
+    res.set('Content-Type', 'text/plain')
+    res.set('Content-Disposition', `attachement;filename=${filename}.txt`)
+
+
+    res.send(buffer)
 })
 
 
