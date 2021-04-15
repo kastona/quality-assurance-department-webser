@@ -30,7 +30,7 @@ const PORT = process.env.PORT || 4000
 app.use(express.json())
 
 let cors = require('cors')
-app.use(cors({origin: '*'}));
+app.use(cors({ origin: '*' }));
 
 const util = require('./util');
 
@@ -56,11 +56,11 @@ const upload = multer({
     },
     fileFilter(req, file, cb) {
         console.log("i am called!")
-        if(!file.originalname.match(/\.(jpeg|jpg|png|pdf)/)) {
+        if (!file.originalname.match(/\.(jpeg|jpg|png|pdf)/)) {
             return cb(new Error('Please upload an image'))
         }
 
-        
+
         cb(undefined, true)
     },
 
@@ -80,11 +80,11 @@ const myUpload = multer({
         fileSize: 3000000
     },
     fileFilter(req, file, cb) {
-        if(!file.originalname.match(/\.(jpeg|jpg|png|pdf)/)) {
+        if (!file.originalname.match(/\.(jpeg|jpg|png|pdf)/)) {
             return cb(new Error('Please upload an image'))
         }
 
-        
+
         cb(undefined, true)
     },
 
@@ -97,16 +97,16 @@ app.post('/files', upload.single('file'), async (req, res) => {
 
     try {
 
-        let filename = req.body.filename? req.body.filename: 'converted file'
-        
+        let filename = req.body.filename ? req.body.filename : 'converted file'
+
         const buffer = await util.recognizeContent(client, req.file.path)
         res.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         res.set('Content-Disposition', `attachement;filename=${filename}.xlsx`)
         return res.send(buffer)
-    }catch(error) {
+    } catch (error) {
         return res.send('error')
     }
-    
+
 })
 
 
@@ -114,19 +114,23 @@ app.post('/read', myUpload.single('file'), async (req, res) => {
 
 
 
+    try {
+
+        let filename = req.body.filename ? req.body.filename : 'converted file'
+
+        const result = await util.textractText(computerVisionClient, req.file);
+        let buffer = Buffer.from(result[0])
+
+        res.set('Content-Type', 'text/plain')
+        res.set('Content-Disposition', `attachement;filename=${filename}.txt`)
 
 
-    let filename = req.body.filename? req.body.filename: 'converted file'
-
-    const result = await util.textractText(computerVisionClient, req.file);
-    let buffer = Buffer.from(result[0])
-
-    res.set('Content-Type', 'text/plain')
-    res.set('Content-Disposition', `attachement;filename=${filename}.txt`)
-
-
-    res.send(buffer)
+        res.send(buffer)
+    } catch (error) {
+        return res.send('error')
+    }
 })
+
 
 
 
