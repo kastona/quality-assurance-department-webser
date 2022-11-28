@@ -52,7 +52,7 @@ const client = new FormRecognizerClient(endpoint, new AzureKeyCredential(apiKey)
 
 const upload = multer({
     limits: {
-        fileSize: 3000000
+        fileSize: 30000000
     },
     fileFilter(req, file, cb) {
         console.log("i am called!")
@@ -77,7 +77,7 @@ const upload = multer({
 
 const myUpload = multer({
     limits: {
-        fileSize: 3000000
+        fileSize: 30000000
     },
     fileFilter(req, file, cb) {
         if (!file.originalname.match(/\.(jpeg|jpg|png|pdf)/)) {
